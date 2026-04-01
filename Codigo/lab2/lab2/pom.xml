@@ -76,6 +76,23 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.micronaut.data</groupId>
+      <artifactId>micronaut-data-document-processor</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.micronaut.data</groupId>
+      <artifactId>micronaut-data-mongodb</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.mongodb</groupId>
+        <artifactId>mongodb-driver-sync</artifactId>
+        <scope>runtime</scope>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>
