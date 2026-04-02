@@ -1,11 +1,13 @@
 package com.aluguelcarros.br.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 
 @Entity
+@DiscriminatorValue("CLIENTE")
 public class ClienteEntity extends UsuarioEntity {
-    @Id
+    @Column(unique = true)
     private String rg;
     private String cpf;
     private String profissao;
