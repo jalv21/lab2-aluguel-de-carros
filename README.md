@@ -13,35 +13,33 @@ cd Codigo/lab2/lab2
 - **Java 25** ou superior
 - **Maven 3.8+**
 
-### 1. Compilar o Projeto
+### 1. Compilar e Gerar o JAR
 
-Execute o comando Maven para compilar:
-
-```bash
-mvn clean compile
-```
-
-Ou no Windows:
+Execute o comando Maven para compilar e gerar o arquivo executável:
 
 ```bash
-mvnw clean compile
+mvn clean package -DskipTests
 ```
+
+Este comando irá:
+- Limpar arquivos anteriores
+- Compilar o código-fonte
+- Gerar o arquivo `target/lab2-0.1.jar`
 
 ### 2. Rodar a Aplicação
 
-Execute o comando para iniciar a aplicação:
+Após a compilação, execute o JAR:
 
 ```bash
-mvn exec:java
-```
-
-Ou no Windows:
-
-```bash
-mvnw exec:java
+java -jar target/lab2-0.1.jar
 ```
 
 A aplicação iniciará na porta **8080**: `http://localhost:8080`
+
+Você verá a mensagem:
+```
+Startup completed in XXX ms. Server Running: http://localhost:8080
+```
 
 ### 3. Endpoints da API
 
@@ -59,10 +57,12 @@ A aplicação fornece uma API REST para gerenciamento de clientes nos seguintes 
 mvn test
 ```
 
-Ou no Windows:
+### 5. Limpar Artifacts de Build
+
+Para remover arquivos gerados durante a compilação:
 
 ```bash
-mvnw test
+mvn clean
 ```
 
 
