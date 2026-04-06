@@ -1,5 +1,13 @@
 ## Como Rodar o Projeto
 
+### Caminho do Projeto
+
+Navegue até a pasta do projeto no terminal:
+
+```bash
+cd Codigo/lab2/lab2
+```
+
 ### Pré-requisitos
 
 - **Java 25** ou superior
