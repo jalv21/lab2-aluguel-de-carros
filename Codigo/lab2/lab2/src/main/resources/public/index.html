@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Aluguel de Carros - Login</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>🚗 Aluguel de Carros</h1>
+            <p class="subtitle">Sistema de Gerenciamento de Rentals</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="login">Login:</label>
+                    <input type="text" id="login" name="login" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" name="senha" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoUsuario">Tipo de Usuário:</label>
+                    <select id="tipoUsuario" name="tipoUsuario" required>
+                        <option value="cliente">Cliente</option>
+                        <option value="banco">Banco</option>
+                        <option value="empresa">Empresa</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Entrar</button>
+            </form>
+
+            <div class="divider">OU</div>
+
+            <div class="register-info">
+                <p>Não possui cadastro?</p>
+                <a href="register.html" class="btn btn-secondary">Cadastrar-se</a>
+            </div>
+
+            <div id="loginMessage" class="message"></div>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>
