@@ -66,20 +66,7 @@ public class Contrato {
         this.assinado = assinado;
     }
 
-    /**
-     * Generate PDF of contract
-     */
-    public void gerarPDF() {
-        System.out.println("PDF do contrato " + this.numero + " foi gerado.");
-    }
 
-    /**
-     * Register signature
-     */
-    public void registrarAssinatura() {
-        System.out.println("Assinatura do contrato " + this.numero + " foi registrada.");
-        this.assinado = true;
-    }
 
     @Override
     public String toString() {

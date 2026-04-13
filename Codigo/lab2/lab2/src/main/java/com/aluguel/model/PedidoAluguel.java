@@ -87,12 +87,7 @@ public class PedidoAluguel {
         this.assinado = assinado;
     }
 
-    /**
-     * Update rental request status
-     */
-    public void atualizarStatus() {
-        System.out.println("Status do pedido ID " + this.id + " atualizado para: " + this.status);
-    }
+
 
     @Override
     public String toString() {

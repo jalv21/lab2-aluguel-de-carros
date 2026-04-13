@@ -1,14 +1,14 @@
 package com.aluguel.repository;
 
 import com.aluguel.model.Rendimento;
-import io.micronaut.context.annotation.Prototype;
+import jakarta.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * In-memory implementation of RendimentoRepository
  */
-@Prototype
+@Singleton
 public class RendimentoRepositoryImpl implements RendimentoRepository {
 
     private final Map<Long, Rendimento> rendimentos = Collections.synchronizedMap(new HashMap<>());

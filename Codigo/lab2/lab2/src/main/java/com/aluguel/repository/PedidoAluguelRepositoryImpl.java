@@ -1,7 +1,7 @@
 package com.aluguel.repository;
 
 import com.aluguel.model.PedidoAluguel;
-import io.micronaut.context.annotation.Prototype;
+import jakarta.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * In-memory implementation of PedidoAluguelRepository
  */
-@Prototype
+@Singleton
 public class PedidoAluguelRepositoryImpl implements PedidoAluguelRepository {
 
     private final Map<Long, PedidoAluguel> pedidos = Collections.synchronizedMap(new HashMap<>());

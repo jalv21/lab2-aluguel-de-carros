@@ -29,19 +29,7 @@ public abstract class Agente extends Usuario {
         this.cnpj = cnpj;
     }
 
-    /**
-     * Evaluate a rental request (Avaliar Pedido)
-     */
-    public void avaliarPedido() {
-        System.out.println(this.getNome() + " avaliou um pedido.");
-    }
 
-    /**
-     * Modify a rental request (Modificar Pedido)
-     */
-    public void modificarPedido() {
-        System.out.println(this.getNome() + " modificou um pedido.");
-    }
 
     @Override
     public String toString() {

@@ -1,14 +1,14 @@
 package com.aluguel.repository;
 
 import com.aluguel.model.Automovel;
-import io.micronaut.context.annotation.Prototype;
+import jakarta.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * In-memory implementation of AutomovelRepository
  */
-@Prototype
+@Singleton
 public class AutomovelRepositoryImpl implements AutomovelRepository {
 
     private final Map<Long, Automovel> automoveis = Collections.synchronizedMap(new HashMap<>());

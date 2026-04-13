@@ -75,11 +75,11 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Thymeleaf for Server-Side Rendering -->
+    <!-- Micronaut Views with Thymeleaf Integration -->
     <dependency>
-      <groupId>org.thymeleaf</groupId>
-      <artifactId>thymeleaf</artifactId>
-      <version>3.1.2.RELEASE</version>
+      <groupId>io.micronaut.views</groupId>
+      <artifactId>micronaut-views-thymeleaf</artifactId>
+      <scope>compile</scope>
     </dependency>
 
   </dependencies>

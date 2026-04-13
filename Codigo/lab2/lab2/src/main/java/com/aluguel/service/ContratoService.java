@@ -46,7 +46,7 @@ public class ContratoService {
         Optional<Contrato> contrato = contratoRepository.findById(id);
         if (contrato.isPresent()) {
             Contrato c = contrato.get();
-            c.registrarAssinatura();
+            c.setAssinado(true);
             contratoRepository.update(id, c);
             return true;
         }
