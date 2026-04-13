@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Aluguel de Carros</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            overflow-x: auto;
+            background: #f5f5f5;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-button:hover {
+            background: #eee;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .btn-success {
+            background: #51cf66;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #40c057;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .form-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .btn-logout {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff6b6b;
+        }
+
+        .btn-logout:hover {
+            background: #ff5252;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Dashboard - Sistema de Aluguel de Carros</h1>
+            <p>Gerencie todos os dados do sistema</p>
+            <button class="btn-logout" onclick="logout()">Sair</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('clientes')">👥 Clientes</button>
+            <button class="tab-button" onclick="openTab('agentes')">🏛️ Agentes</button>
+            <button class="tab-button" onclick="openTab('automoveis')">🚗 Automóveis</button>
+            <button class="tab-button" onclick="openTab('pedidos')">📋 Pedidos Aluguel</button>
+            <button class="tab-button" onclick="openTab('contratos')">📝 Contratos</button>
+            <button class="tab-button" onclick="openTab('rendimentos')">💼 Rendimentos</button>
+        </div>
+
+        <div class="content">
+            <!-- CLIENTES -->
+            <div id="clientes" class="tab-content active">
+                <div class="form-section">
+                    <div class="section-title">Criar/Atualizar Cliente</div>
+                    <form onsubmit="saveCliente(event)">
+                        <input type="hidden" id="clienteId" value="">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Login</label>
+                                <input type="text" id="clienteLogin" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Senha</label>
+                                <input type="password" id="clienteSenha" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nome</label>
+                                <input type="text" id="clienteNome" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Endereço</label>
+                                <input type="text" id="clienteEndereco" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>CPF</label>
+                                <input type="text" id="clienteCPF" required>
+                            </div>
+                            <div class="form-group">
+                                <label>RG</label>
+                                <input type="text" id="clienteRG" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Profissão</label>
+                            <input type="text" id="clienteProfissao" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Salvar Cliente</button>
+                        <button type="button" class="btn-success" onclick="limparFormCliente()">Limpar</button>
+                    </form>
+                </div>
+
+                <div id="clienteAlert"></div>
+                <div class="table-container">
+                    <table id="clienteTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Login</th>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Profissão</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- AGENTES -->
+            <div id="agentes" class="tab-content">
+                <div class="form-section">
+                    <div class="section-title">Criar/Atualizar Agente</div>
+                    <form onsubmit="saveAgente(event)">
+                        <input type="hidden" id="agenteId" value="">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Login</label>
+                                <input type="text" id="agenteLogin" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Senha</label>
+                                <input type="password" id="agenteSenha" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nome da Instituição</label>
+                                <input type="text" id="agenteNome" required>
+                            </div>
+                            <div class="form-group">
+                                <label>CNPJ</label>
+                                <input type="text" id="agenteCNPJ" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Endereço</label>
+                            <input type="text" id="agenteEndereco" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Salvar Agente</button>
+                        <button type="button" class="btn-success" onclick="limparFormAgente()">Limpar</button>
+                    </form>
+                </div>
+
+                <div id="agenteAlert"></div>
+                <div class="table-container">
+                    <table id="agenteTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Login</th>
+                                <th>Nome</th>
+                                <th>CNPJ</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- AUTOMÓVEIS -->
+            <div id="automoveis" class="tab-content">
+                <div class="form-section">
+                    <div class="section-title">Criar/Atualizar Automóvel</div>
+                    <form onsubmit="saveAutomovel(event)">
+                        <input type="hidden" id="automovelId" value="">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Matrícula</label>
+                                <input type="text" id="automovelMatricula" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Placa</label>
+                                <input type="text" id="automovelPlaca" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Marca</label>
+                                <input type="text" id="automovelMarca" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Modelo</label>
+                                <input type="text" id="automovelModelo" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Ano</label>
+                            <input type="number" id="automovelAno" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Salvar Automóvel</button>
+                        <button type="button" class="btn-success" onclick="limparFormAutomovel()">Limpar</button>
+                    </form>
+                </div>
+
+                <div id="automovelAlert"></div>
+                <div class="table-container">
+                    <table id="automovelTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Placa</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Ano</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PEDIDOS ALUGUEL -->
+            <div id="pedidos" class="tab-content">
+                <div class="form-section">
+                    <div class="section-title">Criar/Atualizar Pedido de Aluguel</div>
+                    <form onsubmit="savePedido(event)">
+                        <input type="hidden" id="pedidoId" value="">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Cliente ID</label>
+                                <input type="number" id="pedidoClienteId" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Automóvel ID</label>
+                                <input type="number" id="pedidoAutomovelId" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Data Pedido</label>
+                                <input type="datetime-local" id="pedidoDataPedido" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Data Locação</label>
+                                <input type="datetime-local" id="pedidoDataLocal" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="pedidoStatus" required>
+                                <option value="PENDENTE">Pendente</option>
+                                <option value="APROVADO">Aprovado</option>
+                                <option value="REJEITADO">Rejeitado</option>
+                                <option value="CANCELADO">Cancelado</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Salvar Pedido</button>
+                        <button type="button" class="btn-success" onclick="limparFormPedido()">Limpar</button>
+                    </form>
+                </div>
+
+                <div id="pedidoAlert"></div>
+                <div class="table-container">
+                    <table id="pedidoTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Automóvel</th>
+                                <th>Status</th>
+                                <th>Data Pedido</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CONTRATOS -->
+            <div id="contratos" class="tab-content">
+                <div class="form-section">
+                    <div class="section-title">Criar/Atualizar Contrato</div>
+                    <form onsubmit="saveContrato(event)">
+                        <input type="hidden" id="contratoId" value="">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Número</label>
+                                <input type="text" id="contratoNumero" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo</label>
+                                <input type="text" id="contratoTipo" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Termos</label>
+                            <textarea id="contratoTermos" required rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="contratoAssinado">
+                                Assinado
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-primary">Salvar Contrato</button>
+                        <button type="button" class="btn-success" onclick="limparFormContrato()">Limpar</button>
+                    </form>
+                </div>
+
+                <div id="contratoAlert"></div>
+                <div class="table-container">
+                    <table id="contratoTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Número</th>
+                                <th>Tipo</th>
+                                <th>Assinado</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RENDIMENTOS -->
+            <div id="rendimentos" class="tab-content">
+                <div class="form-section">
+                    <div class="section-title">Criar/Atualizar Rendimento</div>
+                    <form onsubmit="saveRendimento(event)">
+                        <input type="hidden" id="rendimentoId" value="">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Cliente ID</label>
+                                <input type="number" id="rendimentoClienteId" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Valor</label>
+                                <input type="number" id="rendimentoValor" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Entidade Empregadora</label>
+                            <input type="text" id="rendimentoEntidade" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Salvar Rendimento</button>
+                        <button type="button" class="btn-success" onclick="limparFormRendimento()">Limpar</button>
+                    </form>
+                </div>
+
+                <div id="rendimentoAlert"></div>
+                <div class="table-container">
+                    <table id="rendimentoTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Entidade</th>
+                                <th>Valor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+
+        function openTab(tabName) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+
+            loadTabData(tabName);
+        }
+
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'clientes': loadClientes(); break;
+                case 'agentes': loadAgentes(); break;
+                case 'automoveis': loadAutomoveis(); break;
+                case 'pedidos': loadPedidos(); break;
+                case 'contratos': loadContratos(); break;
+                case 'rendimentos': loadRendimentos(); break;
+            }
+        }
+
+        // CLIENTES
+        async function loadClientes() {
+            try {
+                const response = await fetch(`${API_URL}/clientes`);
+                const clientes = await response.json();
+                const tbody = document.querySelector('#clienteTable tbody');
+                tbody.innerHTML = '';
+
+                clientes.forEach(cliente => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${cliente.id}</td>
+                            <td>${cliente.login}</td>
+                            <td>${cliente.nome}</td>
+                            <td>${cliente.cpf}</td>
+                            <td>${cliente.profissao}</td>
+                            <td class="actions">
+                                <button class="btn-primary btn-edit" onclick="editCliente(${cliente.id}, '${cliente.login}', '${cliente.nome}', '${cliente.endereco}', '${cliente.cpf}', '${cliente.rg}', '${cliente.profissao}')">Editar</button>
+                                <button class="btn-danger btn-delete" onclick="deleteCliente(${cliente.id})">Deletar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar clientes:', error);
+            }
+        }
+
+        function editCliente(id, login, nome, endereco, cpf, rg, profissao) {
+            document.getElementById('clienteId').value = id;
+            document.getElementById('clienteLogin').value = login;
+            document.getElementById('clienteNome').value = nome;
+            document.getElementById('clienteEndereco').value = endereco;
+            document.getElementById('clienteCPF').value = cpf;
+            document.getElementById('clienteRG').value = rg;
+            document.getElementById('clienteProfissao').value = profissao;
+            window.scrollTo(0, 0);
+        }
+
+        function limparFormCliente() {
+            document.getElementById('clienteId').value = '';
+            document.querySelector('form').reset();
+        }
+
+        async function saveCliente(event) {
+            event.preventDefault();
+            const id = document.getElementById('clienteId').value;
+            const data = {
+                id: id ? parseInt(id) : null,
+                login: document.getElementById('clienteLogin').value,
+                senha: document.getElementById('clienteSenha').value,
+                nome: document.getElementById('clienteNome').value,
+                endereco: document.getElementById('clienteEndereco').value,
+                cpf: document.getElementById('clienteCPF').value,
+                rg: document.getElementById('clienteRG').value,
+                profissao: document.getElementById('clienteProfissao').value
+            };
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(`${API_URL}/clientes`, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showAlert('clienteAlert', 'Cliente salvo com sucesso!', 'success');
+                    limparFormCliente();
+                    loadClientes();
+                } else {
+                    showAlert('clienteAlert', 'Erro ao salvar cliente', 'error');
+                }
+            } catch (error) {
+                showAlert('clienteAlert', 'Erro: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteCliente(id) {
+            if (confirm('Tem certeza que deseja deletar?')) {
+                try {
+                    const response = await fetch(`${API_URL}/clientes/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        showAlert('clienteAlert', 'Cliente deletado!', 'success');
+                        loadClientes();
+                    }
+                } catch (error) {
+                    showAlert('clienteAlert', 'Erro ao deletar', 'error');
+                }
+            }
+        }
+
+        // AGENTES
+        async function loadAgentes() {
+            try {
+                const response = await fetch(`${API_URL}/agentes`);
+                const agentes = await response.json();
+                const tbody = document.querySelector('#agenteTable tbody');
+                tbody.innerHTML = '';
+
+                agentes.forEach(agente => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${agente.id}</td>
+                            <td>${agente.login}</td>
+                            <td>${agente.nome}</td>
+                            <td>${agente.cnpj}</td>
+                            <td class="actions">
+                                <button class="btn-primary btn-edit" onclick="editAgente(${agente.id}, '${agente.login}', '${agente.nome}', '${agente.endereco}', '${agente.cnpj}')">Editar</button>
+                                <button class="btn-danger btn-delete" onclick="deleteAgente(${agente.id})">Deletar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar agentes:', error);
+            }
+        }
+
+        function editAgente(id, login, nome, endereco, cnpj) {
+            document.getElementById('agenteId').value = id;
+            document.getElementById('agenteLogin').value = login;
+            document.getElementById('agenteNome').value = nome;
+            document.getElementById('agenteEndereco').value = endereco;
+            document.getElementById('agenteCNPJ').value = cnpj;
+            window.scrollTo(0, 0);
+        }
+
+        function limparFormAgente() {
+            document.getElementById('agenteId').value = '';
+            document.querySelector('form').reset();
+        }
+
+        async function saveAgente(event) {
+            event.preventDefault();
+            const id = document.getElementById('agenteId').value;
+            const data = {
+                id: id ? parseInt(id) : null,
+                login: document.getElementById('agenteLogin').value,
+                senha: document.getElementById('agenteSenha').value,
+                nome: document.getElementById('agenteNome').value,
+                endereco: document.getElementById('agenteEndereco').value,
+                cnpj: document.getElementById('agenteCNPJ').value
+            };
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(`${API_URL}/agentes`, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showAlert('agenteAlert', 'Agente salvo com sucesso!', 'success');
+                    limparFormAgente();
+                    loadAgentes();
+                }
+            } catch (error) {
+                showAlert('agenteAlert', 'Erro: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteAgente(id) {
+            if (confirm('Tem certeza que deseja deletar?')) {
+                try {
+                    const response = await fetch(`${API_URL}/agentes/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        showAlert('agenteAlert', 'Agente deletado!', 'success');
+                        loadAgentes();
+                    }
+                } catch (error) {
+                    showAlert('agenteAlert', 'Erro ao deletar', 'error');
+                }
+            }
+        }
+
+        // AUTOMÓVEIS
+        async function loadAutomoveis() {
+            try {
+                const response = await fetch(`${API_URL}/automoveis`);
+                const automoveis = await response.json();
+                const tbody = document.querySelector('#automovelTable tbody');
+                tbody.innerHTML = '';
+
+                automoveis.forEach(auto => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${auto.id}</td>
+                            <td>${auto.placa}</td>
+                            <td>${auto.marca}</td>
+                            <td>${auto.modelo}</td>
+                            <td>${auto.ano}</td>
+                            <td class="actions">
+                                <button class="btn-primary btn-edit" onclick="editAutomovel(${auto.id}, '${auto.matricula}', '${auto.placa}', '${auto.marca}', '${auto.modelo}', ${auto.ano})">Editar</button>
+                                <button class="btn-danger btn-delete" onclick="deleteAutomovel(${auto.id})">Deletar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar automóveis:', error);
+            }
+        }
+
+        function editAutomovel(id, matricula, placa, marca, modelo, ano) {
+            document.getElementById('automovelId').value = id;
+            document.getElementById('automovelMatricula').value = matricula;
+            document.getElementById('automovelPlaca').value = placa;
+            document.getElementById('automovelMarca').value = marca;
+            document.getElementById('automovelModelo').value = modelo;
+            document.getElementById('automovelAno').value = ano;
+            window.scrollTo(0, 0);
+        }
+
+        function limparFormAutomovel() {
+            document.getElementById('automovelId').value = '';
+            document.querySelector('form').reset();
+        }
+
+        async function saveAutomovel(event) {
+            event.preventDefault();
+            const id = document.getElementById('automovelId').value;
+            const data = {
+                id: id ? parseInt(id) : null,
+                matricula: document.getElementById('automovelMatricula').value,
+                placa: document.getElementById('automovelPlaca').value,
+                marca: document.getElementById('automovelMarca').value,
+                modelo: document.getElementById('automovelModelo').value,
+                ano: parseInt(document.getElementById('automovelAno').value)
+            };
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(`${API_URL}/automoveis`, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showAlert('automovelAlert', 'Automóvel salvo com sucesso!', 'success');
+                    limparFormAutomovel();
+                    loadAutomoveis();
+                }
+            } catch (error) {
+                showAlert('automovelAlert', 'Erro: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteAutomovel(id) {
+            if (confirm('Tem certeza que deseja deletar?')) {
+                try {
+                    const response = await fetch(`${API_URL}/automoveis/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        showAlert('automovelAlert', 'Automóvel deletado!', 'success');
+                        loadAutomoveis();
+                    }
+                } catch (error) {
+                    showAlert('automovelAlert', 'Erro ao deletar', 'error');
+                }
+            }
+        }
+
+        // PEDIDOS
+        async function loadPedidos() {
+            try {
+                const response = await fetch(`${API_URL}/pedidosaluguel`);
+                const pedidos = await response.json();
+                const tbody = document.querySelector('#pedidoTable tbody');
+                tbody.innerHTML = '';
+
+                pedidos.forEach(pedido => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${pedido.id}</td>
+                            <td>${pedido.clienteId}</td>
+                            <td>${pedido.automovelId}</td>
+                            <td>${pedido.status}</td>
+                            <td>${new Date(pedido.dataPedido).toLocaleDateString('pt-BR')}</td>
+                            <td class="actions">
+                                <button class="btn-primary btn-edit" onclick="editPedido(${pedido.id}, ${pedido.clienteId}, ${pedido.automovelId}, '${pedido.dataPedido}', '${pedido.dataLocal}', '${pedido.status}')">Editar</button>
+                                <button class="btn-danger btn-delete" onclick="deletePedido(${pedido.id})">Deletar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar pedidos:', error);
+            }
+        }
+
+        function editPedido(id, clienteId, automovelId, dataPedido, dataLocal, status) {
+            document.getElementById('pedidoId').value = id;
+            document.getElementById('pedidoClienteId').value = clienteId;
+            document.getElementById('pedidoAutomovelId').value = automovelId;
+            document.getElementById('pedidoDataPedido').value = dataPedido.slice(0, 16);
+            document.getElementById('pedidoDataLocal').value = dataLocal.slice(0, 16);
+            document.getElementById('pedidoStatus').value = status;
+            window.scrollTo(0, 0);
+        }
+
+        function limparFormPedido() {
+            document.getElementById('pedidoId').value = '';
+            document.querySelector('form').reset();
+        }
+
+        async function savePedido(event) {
+            event.preventDefault();
+            const id = document.getElementById('pedidoId').value;
+            const data = {
+                id: id ? parseInt(id) : null,
+                clienteId: parseInt(document.getElementById('pedidoClienteId').value),
+                automovelId: parseInt(document.getElementById('pedidoAutomovelId').value),
+                dataPedido: document.getElementById('pedidoDataPedido').value,
+                dataLocal: document.getElementById('pedidoDataLocal').value,
+                status: document.getElementById('pedidoStatus').value
+            };
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(`${API_URL}/pedidosaluguel`, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showAlert('pedidoAlert', 'Pedido salvo com sucesso!', 'success');
+                    limparFormPedido();
+                    loadPedidos();
+                }
+            } catch (error) {
+                showAlert('pedidoAlert', 'Erro: ' + error.message, 'error');
+            }
+        }
+
+        async function deletePedido(id) {
+            if (confirm('Tem certeza que deseja deletar?')) {
+                try {
+                    const response = await fetch(`${API_URL}/pedidosaluguel/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        showAlert('pedidoAlert', 'Pedido deletado!', 'success');
+                        loadPedidos();
+                    }
+                } catch (error) {
+                    showAlert('pedidoAlert', 'Erro ao deletar', 'error');
+                }
+            }
+        }
+
+        // CONTRATOS
+        async function loadContratos() {
+            try {
+                const response = await fetch(`${API_URL}/contratos`);
+                const contratos = await response.json();
+                const tbody = document.querySelector('#contratoTable tbody');
+                tbody.innerHTML = '';
+
+                contratos.forEach(contrato => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${contrato.id}</td>
+                            <td>${contrato.numero}</td>
+                            <td>${contrato.tipoContrato}</td>
+                            <td>${contrato.assinado ? 'Sim' : 'Não'}</td>
+                            <td class="actions">
+                                <button class="btn-primary btn-edit" onclick="editContrato(${contrato.id}, '${contrato.numero}', '${contrato.termos}', '${contrato.tipoContrato}', ${contrato.assinado})">Editar</button>
+                                <button class="btn-danger btn-delete" onclick="deleteContrato(${contrato.id})">Deletar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar contratos:', error);
+            }
+        }
+
+        function editContrato(id, numero, termos, tipo, assinado) {
+            document.getElementById('contratoId').value = id;
+            document.getElementById('contratoNumero').value = numero;
+            document.getElementById('contratoTermos').value = termos;
+            document.getElementById('contratoTipo').value = tipo;
+            document.getElementById('contratoAssinado').checked = assinado;
+            window.scrollTo(0, 0);
+        }
+
+        function limparFormContrato() {
+            document.getElementById('contratoId').value = '';
+            document.querySelector('form').reset();
+        }
+
+        async function saveContrato(event) {
+            event.preventDefault();
+            const id = document.getElementById('contratoId').value;
+            const data = {
+                id: id ? parseInt(id) : null,
+                numero: document.getElementById('contratoNumero').value,
+                termos: document.getElementById('contratoTermos').value,
+                tipoContrato: document.getElementById('contratoTipo').value,
+                assinado: document.getElementById('contratoAssinado').checked
+            };
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(`${API_URL}/contratos`, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showAlert('contratoAlert', 'Contrato salvo com sucesso!', 'success');
+                    limparFormContrato();
+                    loadContratos();
+                }
+            } catch (error) {
+                showAlert('contratoAlert', 'Erro: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteContrato(id) {
+            if (confirm('Tem certeza que deseja deletar?')) {
+                try {
+                    const response = await fetch(`${API_URL}/contratos/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        showAlert('contratoAlert', 'Contrato deletado!', 'success');
+                        loadContratos();
+                    }
+                } catch (error) {
+                    showAlert('contratoAlert', 'Erro ao deletar', 'error');
+                }
+            }
+        }
+
+        // RENDIMENTOS
+        async function loadRendimentos() {
+            try {
+                const response = await fetch(`${API_URL}/rendimentos`);
+                const rendimentos = await response.json();
+                const tbody = document.querySelector('#rendimentoTable tbody');
+                tbody.innerHTML = '';
+
+                rendimentos.forEach(rendimento => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${rendimento.id}</td>
+                            <td>${rendimento.clienteId}</td>
+                            <td>${rendimento.entidadeEmpregadora}</td>
+                            <td>R$ ${rendimento.valor.toFixed(2)}</td>
+                            <td class="actions">
+                                <button class="btn-primary btn-edit" onclick="editRendimento(${rendimento.id}, ${rendimento.clienteId}, '${rendimento.entidadeEmpregadora}', ${rendimento.valor})">Editar</button>
+                                <button class="btn-danger btn-delete" onclick="deleteRendimento(${rendimento.id})">Deletar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar rendimentos:', error);
+            }
+        }
+
+        function editRendimento(id, clienteId, entidade, valor) {
+            document.getElementById('rendimentoId').value = id;
+            document.getElementById('rendimentoClienteId').value = clienteId;
+            document.getElementById('rendimentoEntidade').value = entidade;
+            document.getElementById('rendimentoValor').value = valor;
+            window.scrollTo(0, 0);
+        }
+
+        function limparFormRendimento() {
+            document.getElementById('rendimentoId').value = '';
+            document.querySelector('form').reset();
+        }
+
+        async function saveRendimento(event) {
+            event.preventDefault();
+            const id = document.getElementById('rendimentoId').value;
+            const data = {
+                id: id ? parseInt(id) : null,
+                clienteId: parseInt(document.getElementById('rendimentoClienteId').value),
+                entidadeEmpregadora: document.getElementById('rendimentoEntidade').value,
+                valor: parseFloat(document.getElementById('rendimentoValor').value)
+            };
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(`${API_URL}/rendimentos`, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showAlert('rendimentoAlert', 'Rendimento salvo com sucesso!', 'success');
+                    limparFormRendimento();
+                    loadRendimentos();
+                }
+            } catch (error) {
+                showAlert('rendimentoAlert', 'Erro: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteRendimento(id) {
+            if (confirm('Tem certeza que deseja deletar?')) {
+                try {
+                    const response = await fetch(`${API_URL}/rendimentos/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        showAlert('rendimentoAlert', 'Rendimento deletado!', 'success');
+                        loadRendimentos();
+                    }
+                } catch (error) {
+                    showAlert('rendimentoAlert', 'Erro ao deletar', 'error');
+                }
+            }
+        }
+
+        // UTILITIES
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => alert.innerHTML = '', 5000);
+        }
+
+        function logout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Load initial data
+        loadClientes();
+    </script>
+</body>
+</html>

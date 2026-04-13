@@ -59,11 +59,23 @@ public class TemplateController {
         return HttpResponse.seeOther(URI.create("/dashboard-cliente.html"));
     }
 
+    @Get("/register")
+    @Produces(MediaType.TEXT_HTML)
+    public HttpResponse<?> registerGet() {
+        return HttpResponse.seeOther(URI.create("/register.html"));
+    }
+
     @Post("/register")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public HttpResponse<?> register() {
         // Redirecionar para login após registro
         return HttpResponse.seeOther(URI.create("/login.html?success=Usuário%20registrado"));
+    }
+
+    @Get("/dashboard")
+    @Produces(MediaType.TEXT_HTML)
+    public HttpResponse<String> dashboard() throws IOException {
+        return getTemplateFile("public/dashboard.html");
     }
 
     private HttpResponse<String> getTemplateFile(String path) throws IOException {
