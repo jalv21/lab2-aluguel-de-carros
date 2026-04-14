@@ -50,37 +50,7 @@ public class Cliente extends Usuario {
         this.profissao = profissao;
     }
 
-    /**
-     * Request a rental (Solicitar Aluguel)
-     */
-    public void solicitarAluguel() {
-        // TODO: Implement rental request logic
-        System.out.println(this.getNome() + " solicitou um aluguel.");
-    }
 
-    /**
-     * Modify a rental/request order (Modificar Pedido)
-     */
-    public void modificarPedido() {
-        // TODO: Implement modify order logic
-        System.out.println(this.getNome() + " modificou seu pedido.");
-    }
-
-    /**
-     * Cancel a rental/request order (Cancelar Pedido)
-     */
-    public void cancelarPedido() {
-        // TODO: Implement cancel order logic
-        System.out.println(this.getNome() + " cancelou seu pedido.");
-    }
-
-    /**
-     * Sign contract (Assinar Contrato)
-     */
-    public void assinaturContrato() {
-        // TODO: Implement contract signing logic
-        System.out.println(this.getNome() + " assinou o contrato.");
-    }
 
     @Override
     public String toString() {
