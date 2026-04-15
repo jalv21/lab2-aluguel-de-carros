@@ -16,7 +16,6 @@
   <properties>
     <packaging>jar</packaging>
     <jdk.version>25</jdk.version>
-    <release.version>25</release.version>
     <micronaut.version>4.10.10</micronaut.version>
     <micronaut.aot.enabled>false</micronaut.aot.enabled>
     <micronaut.aot.packageName>com.aluguel.aot.generated</micronaut.aot.packageName>
@@ -76,6 +75,13 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Micronaut Views with Thymeleaf Integration -->
+    <dependency>
+      <groupId>io.micronaut.views</groupId>
+      <artifactId>micronaut-views-thymeleaf</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>
@@ -97,7 +103,8 @@
         <configuration>
           <!-- Uncomment to enable incremental compilation -->
           <!-- <useIncrementalCompilation>false</useIncrementalCompilation> -->
-
+          <source>25</source>
+          <target>25</target>
           <annotationProcessorPaths combine.children="append">
             <path>
               <groupId>io.micronaut</groupId>

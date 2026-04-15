@@ -1,14 +1,14 @@
 package com.aluguel.repository;
 
 import com.aluguel.model.Cliente;
-import io.micronaut.context.annotation.Prototype;
+import jakarta.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * In-memory implementation of ClienteRepository
  */
-@Prototype
+@Singleton
 public class ClienteRepositoryImpl implements ClienteRepository {
 
     private final Map<Long, Cliente> clientes = Collections.synchronizedMap(new HashMap<>());
