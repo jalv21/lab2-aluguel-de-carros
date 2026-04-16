@@ -33,8 +33,8 @@ public class DataInitializer {
     @Inject
     private RendimentoRepository rendimentoRepository;
 
-    @EventListener
-    public void onStartup(StartupEvent event) {
+    // POPULAÇÃO AUTOMÁTICA DESABILITADA - método renomeado
+    public void onStartup_DISABLED(StartupEvent event) {
         try {
             LOG.info("========== INICIANDO POPULAÇÃO DE DADOS ==========");
             initializaClientes();

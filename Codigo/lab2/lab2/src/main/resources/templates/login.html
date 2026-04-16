@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Aluguel de Carros</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Feather Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .login-container {
+            animation: slideUp 0.6s ease-out;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn-login {
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="h-screen flex items-center justify-center p-4">
+    <div class="login-container w-full max-w-md">
+        <!-- Logo Section -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg mb-4">
+                <i data-feather="car" class="w-8 h-8 text-purple-600"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-2">Aluguel de Carros</h1>
+            <p class="text-purple-200">Sistema de Gestão</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <!-- Error Message -->
+            <div th:if="${error}" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div class="flex items-center gap-2 text-red-700">
+                    <i data-feather="alert-circle" class="w-5 h-5"></i>
+                    <p class="text-sm font-medium" th:text="${error}"></p>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div th:if="${message}" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div class="flex items-center gap-2 text-green-700">
+                    <i data-feather="check-circle" class="w-5 h-5"></i>
+                    <p class="text-sm font-medium" th:text="${message}"></p>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <form method="POST" th:action="@{/login}" class="space-y-4" id="loginForm">
+                <!-- Username Field -->
+                <div>
+                    <label for="login" class="block text-sm font-medium text-gray-700 mb-2">
+                        Usuário
+                    </label>
+                    <div class="relative">
+                        <i data-feather="user" class="absolute left-3 top-3 w-5 h-5 text-gray-400"></i>
+                        <input
+                            type="text"
+                            id="login"
+                            name="login"
+                            th:value="${login}"
+                            placeholder="Seu usuário"
+                            class="input-field w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                            required
+                            autocomplete="username"
+                        >
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label for="senha" class="block text-sm font-medium text-gray-700 mb-2">
+                        Senha
+                    </label>
+                    <div class="relative">
+                        <i data-feather="lock" class="absolute left-3 top-3 w-5 h-5 text-gray-400"></i>
+                        <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            placeholder="Sua senha"
+                            class="input-field w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                            required
+                            autocomplete="current-password"
+                        >
+                    </div>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center gap-2 text-gray-600 cursor-pointer">
+                        <input type="checkbox" name="remember" class="w-4 h-4 rounded border-gray-300">
+                        <span>Lembrar-me</span>
+                    </label>
+                    <a href="#" class="text-purple-600 hover:text-purple-700 font-medium">
+                        Esqueceu a senha?
+                    </a>
+                </div>
+
+                <!-- Submit Button -->
+                <button
+                    type="submit"
+                    class="btn-login w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                >
+                    <span class="flex items-center justify-center gap-2">
+                        <i data-feather="log-in" class="w-5 h-5"></i>
+                        Entrar
+                    </span>
+                </button>
+            </form>
+
+            <!-- Demo Credentials Info -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <p class="text-center text-sm text-gray-600 mb-3">
+                    <strong>Credenciais de Demo:</strong>
+                </p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2 text-gray-700">
+                        <span class="font-medium">Usuário:</span>
+                        <span class="text-gray-500">admin</span>
+                        <span class="font-medium">Senha:</span>
+                        <span class="text-gray-500">admin123</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-700">
+                        <span class="font-medium">Usuário:</span>
+                        <span class="text-gray-500">teste</span>
+                        <span class="font-medium">Senha:</span>
+                        <span class="text-gray-500">teste123</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-purple-200 text-sm mt-8">
+            © 2026 Sistema de Aluguel de Carros. Todos os direitos reservados.
+        </p>
+    </div>
+
+    <!-- Initialize Feather Icons -->
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

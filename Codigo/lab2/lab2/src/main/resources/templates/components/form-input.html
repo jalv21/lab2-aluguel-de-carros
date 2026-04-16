@@ -1,0 +1,225 @@
+<!-- Form Input Component Fragment -->
+<!-- Usage: <div th:replace="components/form-input :: inputField('Nome', 'nome', 'text', 'Digite seu nome', true)"></div> -->
+
+<div th:fragment="inputField(label, name, type='text', placeholder='', required=false, disabled=false, value='')">
+    <div class="form-group">
+        <label th:for="${name}" class="form-label">
+            <span th:text="${label}"></span>
+            <span th:if="${required}" class="text-red-500">*</span>
+        </label>
+        <input 
+            th:id="${name}"
+            th:name="${name}"
+            th:type="${type}"
+            th:placeholder="${placeholder}"
+            th:disabled="${disabled}"
+            th:value="${value}"
+            th:class="'form-input' + (${required} ? ' required' : '')"
+            class="form-input"
+        >
+        <p class="form-help" th:if="${type == 'password'}" style="display: none;">
+            Mínimo 3 caracteres
+        </p>
+    </div>
+</div>
+
+<!-- Form Textarea Component -->
+<div th:fragment="textareaField(label, name, placeholder='', required=false, rows=5, value='')">
+    <div class="form-group">
+        <label th:for="${name}" class="form-label">
+            <span th:text="${label}"></span>
+            <span th:if="${required}" class="text-red-500">*</span>
+        </label>
+        <textarea 
+            th:id="${name}"
+            th:name="${name}"
+            th:placeholder="${placeholder}"
+            th:rows="${rows}"
+            class="form-textarea"
+            th:text="${value}"
+            th:class="'form-textarea' + (${required} ? ' required' : '')"
+        ></textarea>
+    </div>
+</div>
+
+<!-- Form Select Component -->
+<div th:fragment="selectField(label, name, options, required=false, value='')">
+    <div class="form-group">
+        <label th:for="${name}" class="form-label">
+            <span th:text="${label}"></span>
+            <span th:if="${required}" class="text-red-500">*</span>
+        </label>
+        <select 
+            th:id="${name}"
+            th:name="${name}"
+            class="form-select"
+            th:class="'form-select' + (${required} ? ' required' : '')"
+        >
+            <option value="">-- Selecione --</option>
+            <option th:each="opt : ${options}" th:value="${opt.value}" th:text="${opt.label}" th:selected="${opt.value == value}"></option>
+        </select>
+    </div>
+</div>
+
+<!-- Form Checkbox Component -->
+<div th:fragment="checkboxField(label, name, checked=false, value='on')">
+    <div class="form-group">
+        <label class="flex items-center gap-2 cursor-pointer">
+            <input 
+                type="checkbox"
+                th:id="${name}"
+                th:name="${name}"
+                th:value="${value}"
+                th:checked="${checked}"
+                class="rounded border-gray-300"
+            >
+            <span class="text-gray-700" th:text="${label}"></span>
+        </label>
+    </div>
+</div>
+
+<!-- Form Radio Component -->
+<div th:fragment="radioField(label, name, options, required=false, value='')">
+    <div class="form-group">
+        <label class="form-label">
+            <span th:text="${label}"></span>
+            <span th:if="${required}" class="text-red-500">*</span>
+        </label>
+        <div class="space-y-2">
+            <div th:each="opt : ${options}" class="flex items-center gap-2">
+                <input 
+                    type="radio"
+                    th:id="${name + '_' + opt.value}"
+                    th:name="${name}"
+                    th:value="${opt.value}"
+                    th:checked="${opt.value == value}"
+                    class="rounded-full border-gray-300"
+                >
+                <label th:for="${name + '_' + opt.value}" class="text-gray-700 cursor-pointer" th:text="${opt.label}"></label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Error Display -->
+<div th:fragment="errorMessage(message)">
+    <p class="form-error" th:text="${message}"></p>
+</div>
+
+<!-- Form Group with Label and Required -->
+<div th:fragment="formGroup(label, name, required=false)">
+    <div class="form-group">
+        <label th:for="${name}" class="form-label">
+            <span th:text="${label}"></span>
+            <span th:if="${required}" class="text-red-500">*</span>
+        </label>
+        <!-- Content goes here where fragment is replaced -->
+    </div>
+</div>
+
+<!-- Form Buttons Row -->
+<div th:fragment="formButtons(submitLabel='Salvar', cancelUrl='/dashboard')">
+    <div class="form-group mt-8 flex gap-3">
+        <button type="submit" class="btn btn-primary">
+            <i data-feather="check" class="w-4 h-4 inline mr-2"></i>
+            <span th:text="${submitLabel}">Salvar</span>
+        </button>
+        <a th:href="${cancelUrl}" class="btn btn-outline">
+            <i data-feather="x" class="w-4 h-4 inline mr-2"></i>
+            Cancelar
+        </a>
+    </div>
+</div>
+
+<!-- Table Header with Sort -->
+<th th:fragment="sortableHeader(columnName, displayName, currentSort='')">
+    <button 
+        onclick="applySingleFilter('sort', '[[ ${columnName} ]]' + ':' + ('[[ ${currentSort} ]]' === '[[ ${columnName} ]]:asc' ? 'desc' : 'asc'))"
+        class="hover:text-blue-600"
+    >
+        <span th:text="${displayName}"></span>
+        <i 
+            th:if="${currentSort.contains(columnName + ':asc')}"
+            data-feather="arrow-up" 
+            class="w-4 h-4 inline ml-1"
+        ></i>
+        <i 
+            th:if="${currentSort.contains(columnName + ':desc')}"
+            data-feather="arrow-down" 
+            class="w-4 h-4 inline ml-1"
+        ></i>
+    </button>
+</th>
+
+<!-- Action Buttons Row -->
+<td th:fragment="actionButtons(resourceId, resourceName)">
+    <div class="flex gap-2">
+        <a th:href="@{${resourceName} + '/' + ${resourceId} + '/edit'}" class="text-blue-600 hover:text-blue-800">
+            <i data-feather="edit" class="w-4 h-4"></i>
+        </a>
+        <button type="button" th:onclick="'confirmDelete(' + ${resourceId} + ', \'${resourceName}\')'" class="text-red-600 hover:text-red-800">
+            <i data-feather="trash-2" class="w-4 h-4"></i>
+        </button>
+    </div>
+</td>
+
+<!-- Status Badge -->
+<span th:fragment="statusBadge(status)">
+    <span th:class="'status-badge status-' + ${status.toLowerCase()}">
+        <i data-feather="check-circle" class="w-3 h-3"></i>
+        <span th:text="${status}"></span>
+    </span>
+</span>
+
+<!-- Empty State -->
+<div th:fragment="emptyState(message='Nenhum registro encontrado')">
+    <div class="text-center py-12">
+        <i data-feather="inbox" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+        <p class="text-gray-600" th:text="${message}"></p>
+        <p class="text-gray-500 text-sm mt-1">Comece adicionando um novo registro</p>
+    </div>
+</div>
+
+<!-- Loading State -->
+<div th:fragment="loadingState(message='Carregando...')">
+    <div class="text-center py-12">
+        <i data-feather="loader" class="w-12 h-12 text-blue-600 mx-auto mb-4 animate-spin"></i>
+        <p class="text-gray-600" th:text="${message}"></p>
+    </div>
+</div>
+
+<!-- Page Header -->
+<div th:fragment="pageHeader(title, description='', breadcrumb='')">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900" th:text="${title}"></h1>
+        <p class="text-gray-600 mt-1" th:text="${description}" th:if="${description}"></p>
+        <nav class="text-sm text-gray-600 mt-3" th:if="${breadcrumb}" th:utext="${breadcrumb}"></nav>
+    </div>
+</div>
+
+<!-- Tabs Component -->
+<div th:fragment="tabs(tabs, activeTab='')">
+    <div class="border-b mb-6">
+        <nav class="flex gap-4 -mb-px">
+            <button 
+                th:each="tab : ${tabs}"
+                th:class="'px-4 py-2 text-sm font-medium border-b-2 transition-colors ' + (${tab.id == activeTab} ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-800')"
+                onclick="switchTab('[[ ${tab.id} ]]')"
+                th:text="${tab.label}"
+            ></button>
+        </nav>
+    </div>
+</div>
+
+<!-- Card Component -->
+<div th:fragment="card(title='', subtitle='')">
+    <div class="card">
+        <div th:if="${title}" class="card-header">
+            <h3 class="text-lg font-semibold text-gray-900" th:text="${title}"></h3>
+            <p class="text-gray-600 text-sm mt-1" th:text="${subtitle}" th:if="${subtitle}"></p>
+        </div>
+        <div class="card-body">
+            <!-- Content goes here -->
+        </div>
+    </div>
+</div>

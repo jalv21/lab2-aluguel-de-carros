@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} != null ? ${title} + ' - Aluguel de Carros' : 'Aluguel de Carros'">Aluguel de Carros</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Feather Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Wrapper container for sidebar + content -->
+    <div class="flex h-screen bg-gray-100">
+        
+        <!-- Sidebar Navigation -->
+        <div th:replace="layout/sidebar :: sidebar"></div>
+        
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- Top Header -->
+            <header class="bg-white shadow">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800" th:text="${pageTitle} != null ? ${pageTitle} : 'Dashboard'">Dashboard</h1>
+                    <div class="flex items-center gap-4">
+                        <span class="text-gray-600" th:text="${userRole} != null ? ${userRole} : 'Usuário'">Usuário</span>
+                        <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                            <i data-feather="log-out" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Breadcrumb -->
+                <div class="px-6 py-2 bg-gray-50 border-t">
+                    <nav class="text-sm text-gray-600" th:if="${breadcrumb} != null">
+                        <span th:utext="${breadcrumb}">Breadcrumb</span>
+                    </nav>
+                </div>
+            </header>
+            
+            <!-- Main Content -->
+            <main class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-6 py-8">
+                    
+                    <!-- Flash Messages -->
+                    <div id="messagesContainer"></div>
+                    
+                    <!-- Page Content -->
+                    <div th:block="pageContent">
+                        <!-- Content will be inserted here by child templates -->
+                    </div>
+                    
+                </div>
+            </main>
+            
+        </div>
+        
+    </div>
+    
+    <!-- Modal Template -->
+    <div id="modalTemplate" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b">
+                <h2 id="modalTitle" class="text-lg font-semibold text-gray-800"></h2>
+            </div>
+            <div id="modalBody" class="px-6 py-4"></div>
+            <div class="px-6 py-4 border-t flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button id="modalConfirm" onclick="confirmModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-40 space-y-2"></div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/pagination.js}"></script>
+    <script th:src="@{/js/filters.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    
+    <script>
+        // Initialize feather icons
+        feather.replace();
+    </script>
+</body>
+</html>

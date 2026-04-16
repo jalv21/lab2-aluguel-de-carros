@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente - Aluguel de Carros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <div th:replace="layout/sidebar :: sidebar"></div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Agentes</h1>
+                    <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-6 py-8 max-w-2xl">
+                    <div id="messagesContainer"></div>
+                    <div class="mb-8">
+                        <a href="/agentes" class="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
+                            <i data-feather="arrow-left" class="w-4 h-4 inline mr-1"></i>
+                            Voltar para Agentes
+                        </a>
+                        <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">Novo Agente</h2>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <form id="agenteForm" data-validate>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="login" class="form-label">Login <span class="text-red-500">*</span></label>
+                                    <input type="text" id="login" name="login" class="form-input" required>
+                                </div>
+                                <div>
+                                    <label for="senha" class="form-label">Senha <span class="text-red-500">*</span></label>
+                                    <input type="password" id="senha" name="senha" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="nome" class="form-label">Nome <span class="text-red-500">*</span></label>
+                                <input type="text" id="nome" name="nome" class="form-input" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="endereco" class="form-label">Endereço <span class="text-red-500">*</span></label>
+                                <input type="text" id="endereco" name="endereco" class="form-input" required>
+                            </div>
+                            <div class="mb-6">
+                                <label for="cnpj" class="form-label">CNPJ <span class="text-red-500">*</span></label>
+                                <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00" maxlength="18" class="form-input" required pattern="^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$">
+                            </div>
+                            <div class="flex gap-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="check" class="w-4 h-4 inline mr-2"></i>
+                                    Salvar Agente
+                                </button>
+                                <a href="/agentes" class="btn btn-outline">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div id="toastContainer" class="fixed top-4 right-4 z-40 space-y-2"></div>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        let agenteId = null;
+        async function loadAgente() {
+            const pathParts = window.location.pathname.split('/');
+            if (pathParts.length >= 3 && pathParts[2] !== 'new') {
+                agenteId = pathParts[2];
+                try {
+                    const agente = await fetchAgenteById(agenteId);
+                    document.getElementById('login').value = agente.login;
+                    document.getElementById('nome').value = agente.nome;
+                    document.getElementById('endereco').value = agente.endereco;
+                    document.getElementById('cnpj').value = agente.cnpj;
+                    document.getElementById('senha').style.display = 'none';
+                    document.getElementById('pageTitle').textContent = 'Editar Agente: ' + agente.nome;
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError('Erro ao carregar agente');
+                }
+            }
+        }
+        document.getElementById('agenteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            try {
+                const formData = new FormData(form);
+                const data = {
+                    login: formData.get('login'),
+                    nome: formData.get('nome'),
+                    endereco: formData.get('endereco'),
+                    cnpj: formData.get('cnpj').replace(/\D/g, ''),
+                };
+                if (!agenteId && formData.get('senha')) {
+                    data.senha = formData.get('senha');
+                } else if (agenteId && formData.get('senha')) {
+                    data.senha = formData.get('senha');
+                }
+                if (agenteId) {
+                    await updateAgente(agenteId, data);
+                } else {
+                    await createAgente(data);
+                }
+                setTimeout(() => { window.location.href = '/agentes'; }, 1500);
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Erro ao salvar agente');
+            }
+        });
+        document.addEventListener('DOMContentLoaded', loadAgente);
+    </script>
+</body>
+</html>

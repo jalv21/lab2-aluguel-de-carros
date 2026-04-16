@@ -1,0 +1,85 @@
+<!-- Sidebar Navigation Component -->
+<aside th:fragment="sidebar" class="hidden md:flex w-64 bg-gray-900 text-gray-100 flex-col">
+    
+    <!-- Logo/Brand -->
+    <div class="px-6 py-8">
+        <h1 class="text-2xl font-bold text-white">🚗 CarRental</h1>
+        <p class="text-gray-400 text-sm">Sistema de Aluguel</p>
+    </div>
+    
+    <!-- Navigation Menu -->
+    <nav class="flex-1 px-4 py-6 space-y-2">
+        
+        <!-- Dashboard -->
+        <a href="/" th:href="@{/dashboard}" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition">
+            <i data-feather="home" class="w-5 h-5"></i>
+            <span>Dashboard</span>
+        </a>
+        
+        <!-- Clientes -->
+        <div class="pt-6 pb-2">
+            <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Gerenciamento</p>
+        </div>
+        
+        <a href="/clientes" th:href="@{/clientes}" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition">
+            <i data-feather="users" class="w-5 h-5"></i>
+            <span>Clientes</span>
+        </a>
+        
+        <!-- Automóveis -->
+        <a href="/automoveis" th:href="@{/automoveis}" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition">
+            <i data-feather="truck" class="w-5 h-5"></i>
+            <span>Automóveis</span>
+        </a>
+        
+        <!-- Pedidos de Aluguel -->
+        <a href="/pedidos-aluguel" th:href="@{/pedidos-aluguel}" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition">
+            <i data-feather="calendar" class="w-5 h-5"></i>
+            <span>Pedidos de Aluguel</span>
+        </a>
+        
+        <!-- Contratos -->
+        <a href="/contratos" th:href="@{/contratos}" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition">
+            <i data-feather="file-text" class="w-5 h-5"></i>
+            <span>Contratos</span>
+        </a>
+        
+        <!-- Agentes -->
+        <a href="/agentes" th:href="@{/agentes}" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition">
+            <i data-feather="briefcase" class="w-5 h-5"></i>
+            <span>Agentes</span>
+        </a>
+        
+        <!-- Rendimentos -->
+        <a href="/rendimentos" th:href="@{/rendimentos}" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition">
+            <i data-feather="bar-chart-2" class="w-5 h-5"></i>
+            <span>Rendimentos</span>
+        </a>
+        
+    </nav>
+    
+    <!-- User Footer -->
+    <div class="px-4 py-6 border-t border-gray-700">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                    <span th:text="${userInitial} != null ? ${userInitial} : 'U'">U</span>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-white" th:text="${userName} != null ? ${userName} : 'User'">User</p>
+                    <p class="text-xs text-gray-400" th:text="${userRole} != null ? ${userRole} : 'Role'">Role</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</aside>
+
+<!-- Mobile Menu Toggle (for responsive) -->
+<script>
+    // Toggle mobile menu
+    function toggleMobileMenu() {
+        const sidebar = document.querySelector('aside');
+        sidebar.classList.toggle('hidden');
+    }
+</script>

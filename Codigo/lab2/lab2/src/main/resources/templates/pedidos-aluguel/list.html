@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos de Aluguel - Aluguel de Carros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <div th:replace="layout/sidebar :: sidebar"></div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Pedidos de Aluguel</h1>
+                    <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-6 py-8">
+                    <div id="messagesContainer"></div>
+                    <div class="mb-8 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900">Pedidos de Aluguel</h2>
+                            <p class="text-gray-600 mt-1">Gerencie todos os pedidos de aluguel</p>
+                        </div>
+                        <a href="/pedidos-aluguel/new" class="btn btn-primary">
+                            <i data-feather="plus" class="w-4 h-4 inline mr-2"></i>
+                            Novo Pedido
+                        </a>
+                    </div>
+                    <div class="bg-white rounded-lg shadow mb-6 p-4">
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <div id="searchContainer"></div>
+                            </div>
+                            <div class="w-48">
+                                <label for="statusFilter" class="form-label">Filtrar por Status</label>
+                                <select id="statusFilter" onchange="applySingleFilter('status', this.value)" class="form-select w-full">
+                                    <option value="">-- Todos --</option>
+                                    <option value="PENDENTE">Pendente</option>
+                                    <option value="APROVADO">Aprovado</option>
+                                    <option value="REJEITADO">Rejeitado</option>
+                                    <option value="CANCELADO">Cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Cliente</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Automóvel</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Data Local</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Assinado</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pedidosTableBody" class="divide-y">
+                                <tr><td colspan="7" class="px-6 py-4 text-center"><i data-feather="loader" class="w-6 h-6 inline animate-spin"></i></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div id="modalTemplate" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b"><h2 id="modalTitle" class="text-lg font-semibold text-gray-800"></h2></div>
+            <div id="modalBody" class="px-6 py-4"></div>
+            <div class="px-6 py-4 border-t flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
+                <button id="modalConfirm" onclick="confirmModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    <div id="toastContainer" class="fixed top-4 right-4 z-40 space-y-2"></div>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/pagination.js}"></script>
+    <script th:src="@{/js/filters.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        const PAGE_SIZE = 15;
+        const clientesMap = {};
+        const automovelMap = {};
+        
+        async function loadAutomovelMap() {
+            try {
+                const autos = await fetchAutomoveis(1, 1000);
+                if (autos) autos.forEach(a => { automovelMap[a.id] = `${a.marca} ${a.modelo}`; });
+            } catch (error) { console.error('Error:', error); }
+        }
+        
+        async function loadClienteMap() {
+            try {
+                const clientes = await fetchClientes(1, 1000);
+                if (clientes) clientes.forEach(c => { clientesMap[c.id] = c.nome; });
+            } catch (error) { console.error('Error:', error); }
+        }
+        
+        async function loadPedidos() {
+            try {
+                const page = getQueryParam('page') || 1;
+                const status = getQueryParam('status') || '';
+                
+                if (Object.keys(clientesMap).length === 0) {
+                    await loadClienteMap();
+                    await loadAutomovelMap();
+                }
+                
+                const pedidos = await fetchPedidosAluguel(page, PAGE_SIZE, '', status);
+                
+                document.getElementById('searchContainer').innerHTML = createSearchBox('Buscar por cliente ou automóvel...', 'applySearch');
+                
+                if (status) document.getElementById('statusFilter').value = status;
+                
+                if (pedidos && pedidos.length > 0) {
+                    let html = '';
+                    for (const pedido of pedidos) {
+                        const statusBadgeClass = pedido.status === 'PENDENTE' ? 'bg-yellow-100 text-yellow-800' :
+                                              pedido.status === 'APROVADO' ? 'bg-green-100 text-green-800' :
+                                              pedido.status === 'REJEITADO' ? 'bg-red-100 text-red-800' :
+                                              'bg-gray-100 text-gray-800';
+                        const assinadoIcon = pedido.assinado ? '<i data-feather="check-circle" class="w-4 h-4 text-green-600 inline"></i>' : '<i data-feather="x-circle" class="w-4 h-4 text-gray-400 inline"></i>';
+                        
+                        html += `<tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 text-sm text-gray-900">${pedido.id}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900"><a href="/pedidos-aluguel/${pedido.id}" class="text-blue-600 hover:text-blue-800">${clientesMap[pedido.clienteId] || 'N/A'}</a></td>
+                            <td class="px-6 py-4 text-sm text-gray-900">${automovelMap[pedido.automovelId] || 'N/A'}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900">${formatDate(pedido.dataLocal)}</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs font-medium ${statusBadgeClass}">${pedido.status}</span></td>
+                            <td class="px-6 py-4 text-sm">${assinadoIcon}</td>
+                            <td class="px-6 py-4 text-right text-sm">
+                                <a href="/pedidos-aluguel/${pedido.id}/edit" class="text-blue-600 hover:text-blue-800 mr-3"><i data-feather="edit" class="w-4 h-4 inline"></i></a>
+                                <button type="button" onclick="confirmDeletePedido(${pedido.id})" class="text-red-600 hover:text-red-800"><i data-feather="trash-2" class="w-4 h-4 inline"></i></button>
+                            </td>
+                        </tr>`;
+                    }
+                    document.getElementById('pedidosTableBody').innerHTML = html;
+                } else {
+                    document.getElementById('pedidosTableBody').innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500"><i data-feather="inbox" class="w-12 h-12 mx-auto mb-4 text-gray-400"></i><p>Nenhum pedido encontrado</p></td></tr>`;
+                }
+                feather.replace();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Erro ao carregar pedidos');
+            }
+        }
+        
+        function applySearch(query) {
+            const params = new URLSearchParams(window.location.search);
+            if (query) params.set('search', query); else params.delete('search');
+            params.set('page', 1);
+            window.location.search = params.toString();
+        }
+        
+        function confirmDeletePedido(pedidoId) {
+            confirmDelete(pedidoId, 'pedido', async () => {
+                try { await deletePedidoAluguel(pedidoId); loadPedidos(); } catch (error) { console.error('Error:', error); }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadPedidos);
+    </script>
+</body>
+</html>
