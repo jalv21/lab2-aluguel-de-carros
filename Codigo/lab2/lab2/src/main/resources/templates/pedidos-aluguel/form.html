@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido de Aluguel - Aluguel de Carros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <div th:replace="layout/sidebar :: sidebar"></div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Pedidos de Aluguel</h1>
+                    <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-6 py-8 max-w-2xl">
+                    <div id="messagesContainer"></div>
+                    <div class="mb-8">
+                        <a href="/pedidos-aluguel" class="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
+                            <i data-feather="arrow-left" class="w-4 h-4 inline mr-1"></i>
+                            Voltar para Pedidos
+                        </a>
+                        <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">Novo Pedido de Aluguel</h2>
+                        <p class="text-gray-600 mt-1">Crie um novo pedido de aluguel de veículo</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <form id="pedidoForm" data-validate>
+                            <div class="mb-4">
+                                <label for="clienteId" class="form-label">Cliente <span class="text-red-500">*</span></label>
+                                <select id="clienteId" name="clienteId" class="form-select" required>
+                                    <option value="">-- Selecione um cliente --</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="automovelId" class="form-label">Automóvel <span class="text-red-500">*</span></label>
+                                <select id="automovelId" name="automovelId" class="form-select" required>
+                                    <option value="">-- Selecione um automóvel --</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="dataLocal" class="form-label">Data de Aluguel <span class="text-red-500">*</span></label>
+                                <input type="date" id="dataLocal" name="dataLocal" class="form-input" required>
+                                <p class="form-help text-xs text-gray-500 mt-1">Data deve ser no futuro</p>
+                            </div>
+                            <div class="mb-6">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="assinado" name="assinado" class="rounded border-gray-300">
+                                    <span class="text-gray-700">Marcar como assinado</span>
+                                </label>
+                            </div>
+                            <div class="flex gap-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="check" class="w-4 h-4 inline mr-2"></i>
+                                    Criar Pedido
+                                </button>
+                                <a href="/pedidos-aluguel" class="btn btn-outline">
+                                    <i data-feather="x" class="w-4 h-4 inline mr-2"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div id="modalTemplate" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b"><h2 id="modalTitle" class="text-lg font-semibold text-gray-800"></h2></div>
+            <div id="modalBody" class="px-6 py-4"></div>
+            <div class="px-6 py-4 border-t flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
+                <button id="modalConfirm" onclick="confirmModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    <div id="toastContainer" class="fixed top-4 right-4 z-40 space-y-2"></div>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/pagination.js}"></script>
+    <script th:src="@{/js/filters.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        async function loadFormData() {
+            try {
+                const clientes = await fetchClientes(1, 1000);
+                const automoveis = await fetchAutomoveis(1, 1000);
+                
+                const clienteSelect = document.getElementById('clienteId');
+                const automovelSelect = document.getElementById('automovelId');
+                
+                if (clientes) {
+                    clientes.forEach(c => {
+                        const option = document.createElement('option');
+                        option.value = c.id;
+                        option.text = `${c.nome} (${c.cpf})`;
+                        clienteSelect.appendChild(option);
+                    });
+                }
+                
+                if (automoveis) {
+                    automoveis.forEach(a => {
+                        const option = document.createElement('option');
+                        option.value = a.id;
+                        option.text = `${a.marca} ${a.modelo} (${a.placa})`;
+                        automovelSelect.appendChild(option);
+                    });
+                }
+                
+                // Set min date to tomorrow
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.getElementById('dataLocal').min = tomorrow.toISOString().split('T')[0];
+                
+                feather.replace();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Erro ao carregar dados');
+            }
+        }
+        
+        document.getElementById('pedidoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const validation = validateForm(form);
+            
+            if (!validation.valid) {
+                displayFormErrors(form, validation.errors);
+                showError('Verifique os erros no formulário');
+                return;
+            }
+            
+            try {
+                const formData = new FormData(form);
+                const data = {
+                    clienteId: parseInt(formData.get('clienteId')),
+                    automovelId: parseInt(formData.get('automovelId')),
+                    dataLocal: formData.get('dataLocal'),
+                    assinado: formData.get('assinado') === 'on',
+                };
+                
+                await createPedidoAluguel(data);
+                setTimeout(() => { window.location.href = '/pedidos-aluguel'; }, 1500);
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Erro ao criar pedido');
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', loadFormData);
+    </script>
+</body>
+</html>

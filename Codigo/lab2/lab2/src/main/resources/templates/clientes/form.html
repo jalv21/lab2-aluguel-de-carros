@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente - Aluguel de Carros</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <div th:replace="layout/sidebar :: sidebar"></div>
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Clientes</h1>
+                    <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <main class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-6 py-8 max-w-2xl">
+                    <div id="messagesContainer"></div>
+                    
+                    <!-- Page Header -->
+                    <div class="mb-8">
+                        <a href="/clientes" class="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
+                            <i data-feather="arrow-left" class="w-4 h-4 inline mr-1"></i>
+                            Voltar para Clientes
+                        </a>
+                        <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">Novo Cliente</h2>
+                        <p class="text-gray-600 mt-1">Preencha os dados do cliente</p>
+                    </div>
+                    
+                    <!-- Form -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <form id="clienteForm" data-validate>
+                            
+                            <!-- Login and Password Row -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="login" class="form-label">Login <span class="text-red-500">*</span></label>
+                                    <input type="text" id="login" name="login" placeholder="Digite o login" class="form-input" required>
+                                </div>
+                                <div>
+                                    <label for="senha" class="form-label">Senha <span class="text-red-500">*</span></label>
+                                    <input type="password" id="senha" name="senha" placeholder="Digite a senha" class="form-input" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Name -->
+                            <div class="mb-4">
+                                <label for="nome" class="form-label">Nome Completo <span class="text-red-500">*</span></label>
+                                <input type="text" id="nome" name="nome" placeholder="Digite o nome completo" class="form-input" required>
+                            </div>
+                            
+                            <!-- Address -->
+                            <div class="mb-4">
+                                <label for="endereco" class="form-label">Endereço <span class="text-red-500">*</span></label>
+                                <input type="text" id="endereco" name="endereco" placeholder="Digite o endereço completo" class="form-input" required>
+                            </div>
+                            
+                            <!-- CPF and RG Row -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="cpf" class="form-label">CPF <span class="text-red-500">*</span></label>
+                                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" class="form-input" required maxlength="14">
+                                </div>
+                                <div>
+                                    <label for="rg" class="form-label">RG <span class="text-red-500">*</span></label>
+                                    <input type="text" id="rg" name="rg" placeholder="Digite o RG" class="form-input" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Profession -->
+                            <div class="mb-6">
+                                <label for="profissao" class="form-label">Profissão <span class="text-red-500">*</span></label>
+                                <input type="text" id="profissao" name="profissao" placeholder="Digite a profissão" class="form-input" required>
+                            </div>
+                            
+                            <!-- Buttons -->
+                            <div class="flex gap-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="check" class="w-4 h-4 inline mr-2"></i>
+                                    Salvar Cliente
+                                </button>
+                                <a href="/clientes" class="btn btn-outline">
+                                    <i data-feather="x" class="w-4 h-4 inline mr-2"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                            
+                        </form>
+                    </div>
+                    
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div id="modalTemplate" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b">
+                <h2 id="modalTitle" class="text-lg font-semibold text-gray-800"></h2>
+            </div>
+            <div id="modalBody" class="px-6 py-4"></div>
+            <div class="px-6 py-4 border-t flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
+                <button id="modalConfirm" onclick="confirmModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toastContainer" class="fixed top-4 right-4 z-40 space-y-2"></div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/pagination.js}"></script>
+    <script th:src="@{/js/filters.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    
+    <script>
+        let clienteId = null;
+        const urlParams = new URLSearchParams(window.location.pathname.split('/'));
+        
+        /**
+         * Load cliente data if editing
+         */
+        async function loadCliente() {
+            const pathParts = window.location.pathname.split('/');
+            if (pathParts.length >= 3 && pathParts[2] !== 'new') {
+                clienteId = pathParts[2];
+                
+                try {
+                    const cliente = await fetchClienteById(clienteId);
+                    
+                    // Populate form
+                    document.getElementById('login').value = cliente.login;
+                    document.getElementById('nome').value = cliente.nome;
+                    document.getElementById('endereco').value = cliente.endereco;
+                    document.getElementById('cpf').value = cliente.cpf;
+                    document.getElementById('rg').value = cliente.rg;
+                    document.getElementById('profissao').value = cliente.profissao;
+                    
+                    // Disable CPF on edit (unique constraint)
+                    document.getElementById('cpf').disabled = true;
+                    
+                    // Update page title
+                    document.getElementById('pageTitle').textContent = 'Editar Cliente: ' + cliente.nome;
+                    
+                    // Hide senha field on edit (not typically editable)
+                    document.getElementById('senha').closest('div').style.display = 'none';
+                    
+                } catch (error) {
+                    console.error('Error loading cliente:', error);
+                    showError('Erro ao carregar dados do cliente');
+                }
+            }
+            
+            feather.replace();
+        }
+        
+        /**
+         * Handle form submission
+         */
+        document.getElementById('clienteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const validation = validateForm(form);
+            
+            if (!validation.valid) {
+                displayFormErrors(form, validation.errors);
+                showError('Verifique os erros no formulário');
+                return;
+            }
+            
+            try {
+                const formData = new FormData(form);
+                const data = {
+                    login: formData.get('login'),
+                    senha: formData.get('senha') || 'senha123', // Use placeholder if editing
+                    nome: formData.get('nome'),
+                    endereco: formData.get('endereco'),
+                    cpf: formData.get('cpf').replace(/\D/g, ''),
+                    rg: formData.get('rg'),
+                    profissao: formData.get('profissao'),
+                };
+                
+                if (clienteId) {
+                    // Update
+                    await updateCliente(clienteId, data);
+                } else {
+                    // Create
+                    await createCliente(data);
+                }
+                
+                // Redirect on success
+                setTimeout(() => {
+                    window.location.href = '/clientes';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error saving cliente:', error);
+                if (error.data && error.data.message) {
+                    showError(error.data.message);
+                } else {
+                    showError('Erro ao salvar cliente');
+                }
+            }
+        });
+        
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadCliente);
+    </script>
+</body>
+</html>

@@ -55,12 +55,12 @@ public class ContratoController {
 
     /**
      * Update a contract
-     * PUT /contratos
+     * PUT /contratos/{id}
      */
-    @Put
-    public HttpResponse<Contrato> atualizar(@Body Contrato contrato) {
+    @Put("/{id}")
+    public HttpResponse<Contrato> atualizar(Long id, @Body Contrato contrato) {
         try {
-            Optional<Contrato> atualizado = contratoService.atualizar(contrato.getId(), contrato);
+            Optional<Contrato> atualizado = contratoService.atualizar(id, contrato);
             return atualizado.map(HttpResponse::ok)
                             .orElse(HttpResponse.notFound());
         } catch (IllegalArgumentException e) {

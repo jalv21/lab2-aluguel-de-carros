@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automóvel - Aluguel de Carros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <div th:replace="layout/sidebar :: sidebar"></div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Automóveis</h1>
+                    <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-6 py-8 max-w-2xl">
+                    <div id="messagesContainer"></div>
+                    <div class="mb-8">
+                        <a href="/automoveis" class="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
+                            <i data-feather="arrow-left" class="w-4 h-4 inline mr-1"></i>
+                            Voltar para Automóveis
+                        </a>
+                        <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">Novo Automóvel</h2>
+                        <p class="text-gray-600 mt-1">Preencha os dados do automóvel</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <form id="automovelForm" data-validate>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="marca" class="form-label">Marca <span class="text-red-500">*</span></label>
+                                    <input type="text" id="marca" name="marca" placeholder="Ex: Toyota" class="form-input" required>
+                                </div>
+                                <div>
+                                    <label for="modelo" class="form-label">Modelo <span class="text-red-500">*</span></label>
+                                    <input type="text" id="modelo" name="modelo" placeholder="Ex: Corolla" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="placa" class="form-label">Placa <span class="text-red-500">*</span></label>
+                                    <input type="text" id="placa" name="placa" placeholder="ABC-1234" class="form-input" required maxlength="8" pattern="^[A-Z]{3}-\d{4}$">
+                                </div>
+                                <div>
+                                    <label for="ano" class="form-label">Ano <span class="text-red-500">*</span></label>
+                                    <input type="number" id="ano" name="ano" placeholder="2024" class="form-input" required min="1900" max="2100">
+                                </div>
+                            </div>
+                            <div class="mb-6">
+                                <label for="matricula" class="form-label">Matrícula <span class="text-red-500">*</span></label>
+                                <input type="text" id="matricula" name="matricula" placeholder="Digite a matrícula" class="form-input" required>
+                            </div>
+                            <div class="flex gap-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="check" class="w-4 h-4 inline mr-2"></i>
+                                    Salvar Automóvel
+                                </button>
+                                <a href="/automoveis" class="btn btn-outline">
+                                    <i data-feather="x" class="w-4 h-4 inline mr-2"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div id="modalTemplate" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b"><h2 id="modalTitle" class="text-lg font-semibold text-gray-800"></h2></div>
+            <div id="modalBody" class="px-6 py-4"></div>
+            <div class="px-6 py-4 border-t flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
+                <button id="modalConfirm" onclick="confirmModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    <div id="toastContainer" class="fixed top-4 right-4 z-40 space-y-2"></div>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/pagination.js}"></script>
+    <script th:src="@{/js/filters.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        let automovelId = null;
+        async function loadAutomovel() {
+            const pathParts = window.location.pathname.split('/');
+            if (pathParts.length >= 3 && pathParts[2] !== 'new') {
+                automovelId = pathParts[2];
+                try {
+                    const auto = await fetchAutomovelById(automovelId);
+                    document.getElementById('marca').value = auto.marca;
+                    document.getElementById('modelo').value = auto.modelo;
+                    document.getElementById('placa').value = auto.placa;
+                    document.getElementById('placa').disabled = true;
+                    document.getElementById('ano').value = auto.ano;
+                    document.getElementById('matricula').value = auto.matricula;
+                    document.getElementById('pageTitle').textContent = 'Editar Automóvel: ' + auto.marca + ' ' + auto.modelo;
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError('Erro ao carregar dados do automóvel');
+                }
+            }
+            feather.replace();
+        }
+        document.getElementById('automovelForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const validation = validateForm(form);
+            if (!validation.valid) {
+                displayFormErrors(form, validation.errors);
+                showError('Verifique os erros no formulário');
+                return;
+            }
+            try {
+                const formData = new FormData(form);
+                const data = {
+                    marca: formData.get('marca'),
+                    modelo: formData.get('modelo'),
+                    placa: formData.get('placa'),
+                    ano: parseInt(formData.get('ano')),
+                    matricula: formData.get('matricula'),
+                };
+                if (automovelId) {
+                    await updateAutomovel(automovelId, data);
+                } else {
+                    await createAutomovel(data);
+                }
+                setTimeout(() => { window.location.href = '/automoveis'; }, 1500);
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Erro ao salvar automóvel');
+            }
+        });
+        document.addEventListener('DOMContentLoaded', loadAutomovel);
+    </script>
+</body>
+</html>

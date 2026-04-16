@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Aluguel de Carros</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <div th:replace="layout/sidebar :: sidebar"></div>
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Clientes</h1>
+                    <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <main class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-6 py-8">
+                    <div id="messagesContainer"></div>
+                    
+                    <!-- Page Header -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-900">Gerenciamento de Clientes</h2>
+                                <p class="text-gray-600 mt-1">Gerencie todos os clientes do sistema</p>
+                            </div>
+                            <a href="/clientes/new" class="btn btn-primary">
+                                <i data-feather="plus" class="w-4 h-4 inline mr-2"></i>
+                                Novo Cliente
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Search and Filters -->
+                    <div class="bg-white rounded-lg shadow mb-6 p-4">
+                        <div id="searchContainer"></div>
+                    </div>
+                    
+                    <!-- Table -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full" id="clientesTable">
+                            <thead class="bg-gray-50 border-b">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Nome</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">CPF</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Login</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Profissão</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientesTableBody" class="divide-y">
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                        <i data-feather="loader" class="w-6 h-6 inline animate-spin"></i>
+                                        Carregando...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div id="paginationContainer" class="mt-4"></div>
+                    
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div id="modalTemplate" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b">
+                <h2 id="modalTitle" class="text-lg font-semibold text-gray-800"></h2>
+            </div>
+            <div id="modalBody" class="px-6 py-4"></div>
+            <div class="px-6 py-4 border-t flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
+                <button id="modalConfirm" onclick="confirmModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toastContainer" class="fixed top-4 right-4 z-40 space-y-2"></div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/pagination.js}"></script>
+    <script th:src="@{/js/filters.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    
+    <script>
+        const PAGE_SIZE = 15;
+        let currentPage = 1;
+        let currentSearch = '';
+        
+        /**
+         * Load and display clientes list
+         */
+        async function loadClientes() {
+            try {
+                const page = getQueryParam('page') || 1;
+                const search = getQueryParam('search') || '';
+                
+                currentPage = parseInt(page);
+                currentSearch = search;
+                
+                // Load data
+                const clientes = await fetchClientes(currentPage, PAGE_SIZE, search);
+                
+                // Display search box
+                const searchBox = createSearchBox('Buscar por nome, CPF ou login...', 'applySearch');
+                document.getElementById('searchContainer').innerHTML = searchBox;
+                feather.replace();
+                
+                // Display data
+                if (clientes && clientes.length > 0) {
+                    let html = '';
+                    for (const cliente of clientes) {
+                        html += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cliente.id}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <a href="/clientes/${cliente.id}" class="text-blue-600 hover:text-blue-800">${cliente.nome}</a>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatCPF(cliente.cpf)}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cliente.login}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${cliente.profissao}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <a href="/clientes/${cliente.id}/edit" class="text-blue-600 hover:text-blue-800 mr-3">
+                                        <i data-feather="edit" class="w-4 h-4 inline"></i>
+                                    </a>
+                                    <button type="button" onclick="confirmDeleteCliente(${cliente.id})" class="text-red-600 hover:text-red-800">
+                                        <i data-feather="trash-2" class="w-4 h-4 inline"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                    document.getElementById('clientesTableBody').innerHTML = html;
+                } else {
+                    document.getElementById('clientesTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                                <i data-feather="inbox" class="w-12 h-12 mx-auto mb-4 text-gray-400"></i>
+                                <p>Nenhum cliente encontrado</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                // Setup pagination
+                const totalItems = clientes ? clientes.length : 0;
+                if (totalItems > PAGE_SIZE) {
+                    const paginationInfo = getPaginationInfo(totalItems * 2, currentPage, PAGE_SIZE); // Estimate for demo
+                    const pagination = createPaginationHTML(paginationInfo, 'goToClientesPage');
+                    document.getElementById('paginationContainer').innerHTML = pagination;
+                }
+                
+                feather.replace();
+                
+            } catch (error) {
+                console.error('Error loading clientes:', error);
+                showError('Erro ao carregar clientes');
+            }
+        }
+        
+        /**
+         * Navigate to page
+         */
+        function goToClientesPage(page) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('page', page);
+            window.location.search = params.toString();
+        }
+        
+        /**
+         * Apply search
+         */
+        function applySearch(query) {
+            const params = new URLSearchParams();
+            if (query) params.set('search', query);
+            params.set('page', 1);
+            window.location.search = params.toString();
+        }
+        
+        /**
+         * Confirm delete cliente
+         */
+        function confirmDeleteCliente(clienteId) {
+            confirmDelete(clienteId, 'cliente', async () => {
+                try {
+                    await deleteCliente(clienteId);
+                    loadClientes(); // Reload list
+                } catch (error) {
+                    console.error('Error deleting cliente:', error);
+                }
+            });
+        }
+        
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadClientes);
+    </script>
+</body>
+</html>

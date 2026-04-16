@@ -2,6 +2,7 @@ package com.aluguel.model;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
+import com.aluguel.util.StatusContrato;
 
 /**
  * Contrato (Contract) entity
@@ -15,6 +16,7 @@ public class Contrato {
     private String termos;
     private String tipoContrato; // ALUGUEL, CREDITO, PROPRIEDADE
     private boolean assinado;
+    private String status; // PENDENTE, ATIVO, ASSINADO, VENCIDO, CANCELADO, EM_REVISAO
 
     public Contrato() {
     }
@@ -24,6 +26,7 @@ public class Contrato {
         this.termos = termos;
         this.tipoContrato = tipoContrato;
         this.assinado = false;
+        this.status = StatusContrato.PENDENTE.name();
     }
 
     public Long getId() {
@@ -66,6 +69,14 @@ public class Contrato {
         this.assinado = assinado;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = StatusContrato.fromString(status).name();
+    }
+
 
 
     @Override
@@ -76,6 +87,7 @@ public class Contrato {
                 ", termos='" + termos + '\'' +
                 ", tipoContrato='" + tipoContrato + '\'' +
                 ", assinado=" + assinado +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

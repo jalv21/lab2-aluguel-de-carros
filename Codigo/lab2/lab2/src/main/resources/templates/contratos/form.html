@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato - Aluguel de Carros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <div th:replace="layout/sidebar :: sidebar"></div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Contratos</h1>
+                    <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-6 py-8 max-w-2xl">
+                    <div id="messagesContainer"></div>
+                    <div class="mb-8">
+                        <a href="/contratos" class="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
+                            <i data-feather="arrow-left" class="w-4 h-4 inline mr-1"></i>
+                            Voltar para Contratos
+                        </a>
+                        <h2 class="text-3xl font-bold text-gray-900" id="pageTitle">Novo Contrato</h2>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <form id="contratoForm" data-validate>
+                            <div class="mb-4">
+                                <label for="numero" class="form-label">Número <span class="text-red-500">*</span></label>
+                                <input type="text" id="numero" name="numero" placeholder="Digite o número do contrato" class="form-input" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="tipoContrato" class="form-label">Tipo <span class="text-red-500">*</span></label>
+                                <select id="tipoContrato" name="tipoContrato" class="form-select" required>
+                                    <option value="">-- Selecione um tipo --</option>
+                                    <option value="ALUGUEL">Aluguel</option>
+                                    <option value="CREDITO">Crédito</option>
+                                    <option value="PROPRIEDADE">Propriedade</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="termos" class="form-label">Termos <span class="text-red-500">*</span></label>
+                                <textarea id="termos" name="termos" placeholder="Digite os termos do contrato" class="form-textarea w-full h-32 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500" required></textarea>
+                            </div>
+                            <div class="mb-6">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="assinado" name="assinado" class="rounded border-gray-300">
+                                    <span class="text-gray-700">Marcar como assinado</span>
+                                </label>
+                            </div>
+                            <div class="flex gap-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="check" class="w-4 h-4 inline mr-2"></i>
+                                    Salvar Contrato
+                                </button>
+                                <a href="/contratos" class="btn btn-outline">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div id="toastContainer" class="fixed top-4 right-4 z-40 space-y-2"></div>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        let contratoId = null;
+        async function loadContrato() {
+            const pathParts = window.location.pathname.split('/');
+            if (pathParts.length >= 3 && pathParts[2] !== 'new') {
+                contratoId = pathParts[2];
+                try {
+                    const contrato = await fetchContratoById(contratoId);
+                    document.getElementById('numero').value = contrato.numero;
+                    document.getElementById('numero').disabled = true;
+                    document.getElementById('tipoContrato').value = contrato.tipoContrato;
+                    document.getElementById('termos').value = contrato.termos;
+                    document.getElementById('assinado').checked = contrato.assinado;
+                    document.getElementById('pageTitle').textContent = 'Editar Contrato: ' + contrato.numero;
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError('Erro ao carregar contrato');
+                }
+            }
+        }
+        document.getElementById('contratoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            try {
+                const formData = new FormData(form);
+                const data = {
+                    numero: formData.get('numero'),
+                    tipoContrato: formData.get('tipoContrato'),
+                    termos: formData.get('termos'),
+                    assinado: formData.get('assinado') === 'on',
+                };
+                if (contratoId) {
+                    await updateContrato(contratoId, data);
+                } else {
+                    await createContrato(data);
+                }
+                setTimeout(() => { window.location.href = '/contratos'; }, 1500);
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Erro ao salvar contrato');
+            }
+        });
+        document.addEventListener('DOMContentLoaded', loadContrato);
+    </script>
+</body>
+</html>

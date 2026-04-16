@@ -55,12 +55,12 @@ public class AgenteController {
 
     /**
      * Update an agent
-     * PUT /agentes
+     * PUT /agentes/{id}
      */
-    @Put
-    public HttpResponse<Agente> atualizar(@Body Agente agente) {
+    @Put("/{id}")
+    public HttpResponse<Agente> atualizar(Long id, @Body Agente agente) {
         try {
-            Optional<Agente> atualizado = agenteService.atualizar(agente.getId(), agente);
+            Optional<Agente> atualizado = agenteService.atualizar(id, agente);
             return atualizado.map(HttpResponse::ok)
                             .orElse(HttpResponse.notFound());
         } catch (IllegalArgumentException e) {

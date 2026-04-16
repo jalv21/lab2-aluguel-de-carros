@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rendimento - Aluguel de Carros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <div th:replace="layout/sidebar :: sidebar"></div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Rendimentos</h1>
+                    <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-6 py-8 max-w-2xl">
+                    <div id="messagesContainer"></div>
+                    <div class="mb-8">
+                        <a href="/rendimentos" class="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
+                            <i data-feather="arrow-left" class="w-4 h-4 inline mr-1"></i>
+                            Voltar para Rendimentos
+                        </a>
+                        <h2 class="text-3xl font-bold text-gray-900">Novo Rendimento</h2>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <form id="rendimentoForm" data-validate>
+                            <div class="mb-4">
+                                <label for="entidadeEmpregadora" class="form-label">Entidade Empregadora <span class="text-red-500">*</span></label>
+                                <input type="text" id="entidadeEmpregadora" name="entidadeEmpregadora" placeholder="Digite o nome da entidade" class="form-input" required>
+                            </div>
+                            <div class="mb-6">
+                                <label for="valor" class="form-label">Valor (R$) <span class="text-red-500">*</span></label>
+                                <input type="number" id="valor" name="valor" placeholder="0,00" step="0.01" min="0" class="form-input" required>
+                            </div>
+                            <div class="flex gap-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="check" class="w-4 h-4 inline mr-2"></i>
+                                    Registrar Rendimento
+                                </button>
+                                <a href="/rendimentos" class="btn btn-outline">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div id="toastContainer" class="fixed top-4 right-4 z-40 space-y-2"></div>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        document.getElementById('rendimentoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            try {
+                const formData = new FormData(form);
+                const data = {
+                    entidadeEmpregadora: formData.get('entidadeEmpregadora'),
+                    valor: parseFloat(formData.get('valor')),
+                };
+                await createRendimento(data);
+                setTimeout(() => { window.location.href = '/rendimentos'; }, 1500);
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Erro ao registrar rendimento');
+            }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+        });
+    </script>
+</body>
+</html>
