@@ -55,12 +55,12 @@ public class AutomovelController {
 
     /**
      * Update a vehicle
-     * PUT /automoveis
+     * PUT /automoveis/{id}
      */
-    @Put
-    public HttpResponse<Automovel> atualizar(@Body Automovel automovel) {
+    @Put("/{id}")
+    public HttpResponse<Automovel> atualizar(Long id, @Body Automovel automovel) {
         try {
-            Optional<Automovel> atualizado = automovelService.atualizar(automovel.getId(), automovel);
+            Optional<Automovel> atualizado = automovelService.atualizar(id, automovel);
             return atualizado.map(HttpResponse::ok)
                             .orElse(HttpResponse.notFound());
         } catch (IllegalArgumentException e) {

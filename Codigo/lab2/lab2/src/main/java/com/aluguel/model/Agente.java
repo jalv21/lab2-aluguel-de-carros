@@ -4,11 +4,11 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
 
 /**
- * Agente (Agent) entity - abstract base class for Banco and Empresa
+ * Agente (Agent) entity - base class for Banco and Empresa
  */
 @Serdeable
 @Introspected
-public abstract class Agente extends Usuario {
+public class Agente extends Usuario {
 
     private String cnpj;
 

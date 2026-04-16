@@ -2,6 +2,7 @@ package com.aluguel.model;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
+import com.aluguel.util.StatusPedidoAluguel;
 import java.time.LocalDate;
 
 /**
@@ -15,7 +16,7 @@ public class PedidoAluguel {
     private Long clienteId;
     private Long automovelId;
     private LocalDate dataLocal;
-    private String status; // PENDENTE, APROVADO, REJEITADO, CANCELADO
+    private String status; // SOLICITADO, AGUARDANDO_APROVACAO, APROVADO, REJEITADO, CANCELADO, EM_PROCESSO, FINALIZADO
     private LocalDate dataPedido;
     private boolean assinado;
 
@@ -26,7 +27,7 @@ public class PedidoAluguel {
         this.clienteId = clienteId;
         this.automovelId = automovelId;
         this.dataLocal = dataLocal;
-        this.status = "PENDENTE";
+        this.status = StatusPedidoAluguel.SOLICITADO.name();
         this.dataPedido = LocalDate.now();
         this.assinado = false;
     }
@@ -68,7 +69,7 @@ public class PedidoAluguel {
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        this.status = StatusPedidoAluguel.fromString(status).name();
     }
 
     public LocalDate getDataPedido() {

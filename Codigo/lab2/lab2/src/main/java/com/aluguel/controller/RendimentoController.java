@@ -55,12 +55,12 @@ public class RendimentoController {
 
     /**
      * Update an income record
-     * PUT /rendimentos
+     * PUT /rendimentos/{id}
      */
-    @Put
-    public HttpResponse<Rendimento> atualizar(@Body Rendimento rendimento) {
+    @Put("/{id}")
+    public HttpResponse<Rendimento> atualizar(Long id, @Body Rendimento rendimento) {
         try {
-            Optional<Rendimento> atualizado = rendimentoService.atualizar(rendimento.getId(), rendimento);
+            Optional<Rendimento> atualizado = rendimentoService.atualizar(id, rendimento);
             return atualizado.map(HttpResponse::ok)
                             .orElse(HttpResponse.notFound());
         } catch (IllegalArgumentException e) {

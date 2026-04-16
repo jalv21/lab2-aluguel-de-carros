@@ -12,7 +12,7 @@ import java.util.Optional;
 /**
  * REST Controller for PedidoAluguel CRUD operations
  */
-@Controller("/pedidosaluguel")
+@Controller("/pedidos-aluguel")
 public class PedidoAluguelController {
 
     @Inject
@@ -20,13 +20,13 @@ public class PedidoAluguelController {
 
     /**
      * Create a new rental request
-     * POST /pedidosaluguel
+     * POST /pedidos-aluguel
      */
     @Post
     public HttpResponse<PedidoAluguel> criar(@Body PedidoAluguel pedido) {
         try {
             PedidoAluguel novoPedido = pedidoService.criar(pedido);
-            return HttpResponse.created(novoPedido, URI.create("/pedidosaluguel/" + novoPedido.getId()));
+            return HttpResponse.created(novoPedido, URI.create("/pedidos-aluguel/" + novoPedido.getId()));
         } catch (IllegalArgumentException e) {
             return HttpResponse.badRequest();
         }
@@ -34,7 +34,7 @@ public class PedidoAluguelController {
 
     /**
      * Get a rental request by ID
-     * GET /pedidosaluguel/{id}
+     * GET /pedidos-aluguel/{id}
      */
     @Get("/{id}")
     public HttpResponse<PedidoAluguel> obter(Long id) {
@@ -45,7 +45,7 @@ public class PedidoAluguelController {
 
     /**
      * Get all rental requests
-     * GET /pedidosaluguel
+     * GET /pedidos-aluguel
      */
     @Get
     public HttpResponse<List<PedidoAluguel>> listar() {
@@ -55,7 +55,7 @@ public class PedidoAluguelController {
 
     /**
      * Get rental requests by client
-     * GET /pedidosaluguel/cliente/{clienteId}
+     * GET /pedidos-aluguel/cliente/{clienteId}
      */
     @Get("/cliente/{clienteId}")
     public HttpResponse<List<PedidoAluguel>> listarPorCliente(Long clienteId) {
@@ -65,12 +65,12 @@ public class PedidoAluguelController {
 
     /**
      * Update a rental request
-     * PUT /pedidosaluguel
+     * PUT /pedidos-aluguel/{id}
      */
-    @Put
-    public HttpResponse<PedidoAluguel> atualizar(@Body PedidoAluguel pedido) {
+    @Put("/{id}")
+    public HttpResponse<PedidoAluguel> atualizar(Long id, @Body PedidoAluguel pedido) {
         try {
-            Optional<PedidoAluguel> atualizado = pedidoService.atualizar(pedido.getId(), pedido);
+            Optional<PedidoAluguel> atualizado = pedidoService.atualizar(id, pedido);
             return atualizado.map(HttpResponse::ok)
                             .orElse(HttpResponse.notFound());
         } catch (IllegalArgumentException e) {
@@ -80,7 +80,7 @@ public class PedidoAluguelController {
 
     /**
      * Delete a rental request
-     * DELETE /pedidosaluguel/{id}
+     * DELETE /pedidos-aluguel/{id}
      */
     @Delete("/{id}")
     public HttpResponse<Void> deletar(Long id) {
@@ -92,7 +92,7 @@ public class PedidoAluguelController {
 
     /**
      * Approve a rental request
-     * POST /pedidosaluguel/{id}/aprovar
+     * POST /pedidos-aluguel/{id}/aprovar
      */
     @Post("/{id}/aprovar")
     public HttpResponse<Void> aprovar(Long id) {
@@ -104,7 +104,7 @@ public class PedidoAluguelController {
 
     /**
      * Reject a rental request
-     * POST /pedidosaluguel/{id}/rejeitar
+     * POST /pedidos-aluguel/{id}/rejeitar
      */
     @Post("/{id}/rejeitar")
     public HttpResponse<Void> rejeitar(Long id) {
@@ -116,7 +116,7 @@ public class PedidoAluguelController {
 
     /**
      * Cancel a rental request
-     * POST /pedidosaluguel/{id}/cancelar
+     * POST /pedidos-aluguel/{id}/cancelar
      */
     @Post("/{id}/cancelar")
     public HttpResponse<Void> cancelar(Long id) {
